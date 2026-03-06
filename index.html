@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>簡單硬幣遊戲</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f9; }
+        .coin-container { margin: 20px auto; width: 150px; height: 150px; }
+        .coin {
+            width: 150px; height: 150px;
+            background-color: #ffd700;
+            border: 5px solid #daa520;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #5d4037;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+
+    <h1>擲硬幣遊戲</h1>
+
+    <div class="coin-container">
+        {% if result %}
+            <div class="coin">{{ result }}</div>
+        {% else %}
+            <div class="coin" style="background-color: #ccc; border-color: #999;">?</div>
+        {% endif %}
+    </div>
+
+    <form method="POST">
+        <button type="submit">點擊擲硬幣</button>
+    </form>
+
+    {% if result %}
+        <p>結果是：<strong>{{ result }}</strong></p>
+    {% endif %}
+
+</body>
+</html>
