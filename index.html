@@ -1,55 +1,163 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>簡單硬幣遊戲</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16 基礎色挑戰賽</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f9; }
-        .coin-container { margin: 20px auto; width: 150px; height: 150px; }
-        .coin {
-            width: 150px; height: 150px;
-            background-color: #ffd700;
-            border: 5px solid #daa520;
-            border-radius: 50%;
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: #5d4037;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
         }
-        button {
+
+        h1 { color: #333; }
+
+        #target-name {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 20px 0;
             padding: 10px 20px;
-            font-size: 18px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .color-box {
+            aspect-ratio: 1 / 1;
+            border-radius: 12px;
             cursor: pointer;
-            background-color: #4CAF50;
+            transition: transform 0.2s, opacity 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 3px solid white;
+        }
+
+        .color-box:hover {
+            transform: scale(1.05);
+        }
+
+        .color-box.wrong {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #message {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            height: 1.5rem;
+            font-weight: bold;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: #007bff;
             color: white;
             border: none;
             border-radius: 5px;
         }
-        button:hover { background-color: #45a049; }
     </style>
 </head>
 <body>
 
-    <h1>擲硬幣遊戲</h1>
+    <h1>猜猜這是什麼顏色？</h1>
+    <div id="target-name">載入中...</div>
+    
+    <div id="game-board"></div>
+    
+    <div id="message"></div>
+    <button onclick="initGame()">重新開始</button>
 
-    <div class="coin-container">
-        {% if result %}
-            <div class="coin">{{ result }}</div>
-        {% else %}
-            <div class="coin" style="background-color: #ccc; border-color: #999;">?</div>
-        {% endif %}
-    </div>
+    <script>
+        const colorData = [
+            { name: "黑色 (Black)", hex: "#000000" },
+            { name: "銀色 (Silver)", hex: "#C0C0C0" },
+            { name: "灰色 (Gray)", hex: "#808080" },
+            { name: "白色 (White)", hex: "#FFFFFF" },
+            { name: "紅色 (Red)", hex: "#FF0000" },
+            { name: "紫色 (Purple)", hex: "#800080" },
+            { name: "桃紅色 (Fuchsia)", hex: "#FF00FF" },
+            { name: "綠色 (Green)", hex: "#008000" },
+            { name: "萊姆綠 (Lime)", hex: "#00FF00" },
+            { name: "橄欖綠 (Olive)", hex: "#808000" },
+            { name: "黃色 (Yellow)", hex: "#FFFF00" },
+            { name: "海軍藍 (Navy)", hex: "#000080" },
+            { name: "藍色 (Blue)", hex: "#0000FF" },
+            { name: "青色 (Teal)", hex: "#008080" },
+            { name: "水藍色 (Aqua)", hex: "#00FFFF" },
+            { name: "褐色 (Maroon)", hex: "#800000" }
+        ];
 
-    <form method="POST">
-        <button type="submit">點擊擲硬幣</button>
-    </form>
+        let targetColor = {};
 
-    {% if result %}
-        <p>結果是：<strong>{{ result }}</strong></p>
-    {% endif %}
+        function initGame() {
+            const board = document.getElementById('game-board');
+            const targetDisplay = document.getElementById('target-name');
+            const message = document.getElementById('message');
+            
+            // 清空狀態
+            board.innerHTML = '';
+            message.innerText = '';
+            message.style.color = 'black';
 
+            // 隨機選取正確答案
+            targetColor = colorData[Math.floor(Math.random() * colorData.length)];
+            targetDisplay.innerText = targetColor.name;
+
+            // 打亂顏色順序並產生方塊
+            const shuffledColors = [...colorData].sort(() => Math.random() - 0.5);
+
+            shuffledColors.forEach(color => {
+                const box = document.createElement('div');
+                box.className = 'color-box';
+                box.style.backgroundColor = color.hex;
+                
+                box.onclick = function() {
+                    if (color.hex === targetColor.hex) {
+                        handleWin(box);
+                    } else {
+                        handleWrong(box);
+                    }
+                };
+                
+                board.appendChild(box);
+            });
+        }
+
+        function handleWin(element) {
+            const message = document.getElementById('message');
+            message.innerText = "答對了！太棒了！";
+            message.style.color = "green";
+            
+            // 閃爍效果後進入下一題
+            setTimeout(() => {
+                initGame();
+            }, 1000);
+        }
+
+        function handleWrong(element) {
+            const message = document.getElementById('message');
+            message.innerText = "不對喔，再試試看！";
+            message.style.color = "red";
+            element.classList.add('wrong');
+        }
+
+        // 初始化第一次遊戲
+        initGame();
+    </script>
 </body>
 </html>
